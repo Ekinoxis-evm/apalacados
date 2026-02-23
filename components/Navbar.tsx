@@ -23,11 +23,6 @@ const topics = [
   { name: 'Inteligencia Artificial', href: '/topics/ai', icon: Brain, color: '#ff006e' },
 ]
 
-const navItems = [
-  { label: 'HOME', href: '/' },
-  { label: 'LIVE HUB', href: '/live-hub', live: true },
-  { label: 'EVENTS', href: '/events' },
-]
 
 export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false)
@@ -75,10 +70,27 @@ export default function Navbar() {
             </span>
           </Link>
 
-          {/* ── Desktop Nav ── */}
+          {/* ── Desktop Nav — order: HOME · LIVE HUB · TOPICS · EVENTS ── */}
           <div className="hidden md:flex items-center gap-6">
 
-            {/* Topics Dropdown */}
+            {/* HOME */}
+            <Link
+              href="/"
+              className={`font-chakra text-xs tracking-widest transition-colors ${isActive('/') ? 'text-cyber-green' : 'text-gray-400 hover:text-white'}`}
+            >
+              HOME
+            </Link>
+
+            {/* LIVE HUB */}
+            <Link
+              href="/live-hub"
+              className={`flex items-center gap-1.5 font-chakra text-xs tracking-widest transition-colors ${isActive('/live-hub') ? 'text-cyber-green' : 'text-gray-400 hover:text-white'}`}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-cyber-green animate-live-pulse" />
+              LIVE HUB
+            </Link>
+
+            {/* TOPICS dropdown */}
             <div ref={dropdownRef} className="relative">
               <button
                 onClick={() => setDropdownOpen((v) => !v)}
@@ -120,33 +132,14 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Static nav links */}
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-1.5 font-chakra text-xs tracking-widest transition-colors ${
-                  isActive(item.href)
-                    ? 'text-cyber-green'
-                    : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                {item.live && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-cyber-green animate-live-pulse" />
-                )}
-                {item.label}
-              </Link>
-            ))}
-
-            {/* Kick CTA */}
-            <a
-              href="https://kick.com/wmb81321"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 border border-cyber-green/30 text-cyber-green font-chakra text-xs tracking-widest px-3.5 py-1.5 rounded hover:bg-cyber-green/10 hover:border-cyber-green/60 hover:shadow-[0_0_16px_rgba(0,255,65,0.18)] transition-all"
+            {/* EVENTS */}
+            <Link
+              href="/events"
+              className={`font-chakra text-xs tracking-widest transition-colors ${isActive('/events') ? 'text-cyber-green' : 'text-gray-400 hover:text-white'}`}
             >
-              KICK ↗
-            </a>
+              EVENTS
+            </Link>
+
           </div>
 
           {/* ── Mobile Toggle ── */}
@@ -183,28 +176,16 @@ export default function Navbar() {
               </div>
             </div>
             <div className="border-t border-border-dark pt-3 space-y-2">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center gap-2 py-1.5 font-chakra text-xs tracking-widest transition-colors ${
-                    isActive(item.href) ? 'text-cyber-green' : 'text-gray-400 hover:text-cyber-green'
-                  }`}
-                >
-                  {item.live && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-cyber-green animate-live-pulse" />
-                  )}
-                  {item.label}
-                </Link>
-              ))}
-              <a
-                href="https://kick.com/wmb81321"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 mt-1 border border-cyber-green/30 text-cyber-green font-chakra text-xs tracking-widest px-3.5 py-1.5 rounded hover:bg-cyber-green/10 transition-all"
-              >
-                VER EN KICK ↗
-              </a>
+              <Link href="/" className={`block py-1.5 font-chakra text-xs tracking-widest transition-colors ${isActive('/') ? 'text-cyber-green' : 'text-gray-400 hover:text-cyber-green'}`}>
+                HOME
+              </Link>
+              <Link href="/live-hub" className={`flex items-center gap-2 py-1.5 font-chakra text-xs tracking-widest transition-colors ${isActive('/live-hub') ? 'text-cyber-green' : 'text-gray-400 hover:text-cyber-green'}`}>
+                <span className="w-1.5 h-1.5 rounded-full bg-cyber-green animate-live-pulse" />
+                LIVE HUB
+              </Link>
+              <Link href="/events" className={`block py-1.5 font-chakra text-xs tracking-widest transition-colors ${isActive('/events') ? 'text-cyber-green' : 'text-gray-400 hover:text-cyber-green'}`}>
+                EVENTS
+              </Link>
             </div>
           </div>
         </div>
