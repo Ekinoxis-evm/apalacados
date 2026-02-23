@@ -25,13 +25,16 @@ const outfit = Outfit({
 })
 
 export const metadata: Metadata = {
-  title: 'APALANCADOS — Trading en Vivo, DeFi & Web3',
+  title: {
+    default: 'Apalancados',
+    template: 'Apalancados',
+  },
   description:
-    'El hub definitivo para Trading en Vivo, Futuros Perpetuos, DeFi, IA y Cultura Web3. Contenido educativo sobre mercados financieros.',
+    'En Vido -Online - Gratis - Real. Contenido educativo sobre mercados financieros.',
   keywords: ['trading', 'crypto', 'DeFi', 'perpetuos', 'Web3', 'IA', 'apalancados'],
   openGraph: {
-    title: 'APALANCADOS',
-    description: 'Trading en Vivo · DeFi · Prediction Markets · IA · Web3',
+    title: 'Apalancados',
+    description: 'En Vido -Online - Gratis - Real',
     type: 'website',
   },
 }

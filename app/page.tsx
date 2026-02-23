@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { BarChart2, TrendingUp, ArrowRight, Radio } from 'lucide-react'
+import { BarChart2, TrendingUp, Radio } from 'lucide-react'
 import CoinGeckoHeatmap from '@/components/CoinGeckoHeatmap'
 import BentoGrid from '@/components/BentoGrid'
 
@@ -41,7 +41,7 @@ export default function HomePage() {
               APALANCADOS
             </h1>
             <p className="font-outfit text-base sm:text-lg text-gray-400 tracking-wide max-w-xl mx-auto leading-relaxed">
-              Trading en Vivo · DeFi · Prediction Markets · IA · Web3
+              En Vido -Online - Gratis - Real
             </p>
           </div>
 
@@ -52,46 +52,13 @@ export default function HomePage() {
           </p>
 
           {/* CTAs */}
-          <div className="flex flex-col sm:flex-row items-center gap-3">
-            <Link
-              href="/live-hub"
-              className="flex items-center gap-2 bg-cyber-green text-black font-chakra text-xs tracking-[0.2em] px-6 py-3 rounded hover:bg-cyber-green/90 hover:shadow-[0_0_24px_rgba(0,255,65,0.35)] transition-all"
-            >
-              <Radio className="w-3.5 h-3.5" />
-              VER LIVE HUB
-            </Link>
-            <Link
-              href="/events"
-              className="flex items-center gap-2 border border-border-dark text-gray-400 font-chakra text-xs tracking-[0.2em] px-6 py-3 rounded hover:border-cyber-green/30 hover:text-white transition-all"
-            >
-              PRÓXIMOS EVENTOS
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-
-          {/* Stats bar */}
-          <div className="flex items-center gap-6 sm:gap-10 pt-4 border-t border-border-dark w-full max-w-md justify-center">
-            {[
-              { label: 'PLATAFORMA', value: 'KICK.COM' },
-              { label: 'CONTENIDO', value: 'EDUCATIVO' },
-              { label: 'COMUNIDAD', value: 'WEB3' },
-            ].map((s) => (
-              <div key={s.label} className="text-center">
-                <p
-                  className="text-[10px] tracking-widest text-gray-600 mb-0.5"
-                  style={{ fontFamily: 'var(--font-dm-mono)' }}
-                >
-                  {s.label}
-                </p>
-                <p
-                  className="text-xs tracking-wider text-cyber-green"
-                  style={{ fontFamily: 'var(--font-dm-mono)' }}
-                >
-                  {s.value}
-                </p>
-              </div>
-            ))}
-          </div>
+          <Link
+            href="/live-hub"
+            className="flex items-center gap-2 bg-cyber-green text-black font-chakra text-xs tracking-[0.2em] px-6 py-3 rounded hover:bg-cyber-green/90 hover:shadow-[0_0_24px_rgba(0,255,65,0.35)] transition-all"
+          >
+            <Radio className="w-3.5 h-3.5" />
+            VER LIVE HUB
+          </Link>
         </div>
       </section>
 
