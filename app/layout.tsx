@@ -30,11 +30,11 @@ export const metadata: Metadata = {
     template: 'Apalancados',
   },
   description:
-    'En Vido -Online - Gratis - Real. Contenido educativo sobre mercados financieros.',
+    'En vivo - Online - Gratis - Real. Contenido educativo sobre mercados financieros.',
   keywords: ['trading', 'crypto', 'DeFi', 'perpetuos', 'Web3', 'IA', 'apalancados'],
   openGraph: {
     title: 'Apalancados',
-    description: 'En Vido -Online - Gratis - Real',
+    description: 'En vivo - Online - Gratis - Real',
     type: 'website',
   },
 }

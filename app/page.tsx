@@ -41,7 +41,7 @@ export default function HomePage() {
               APALANCADOS
             </h1>
             <p className="font-outfit text-base sm:text-lg text-gray-400 tracking-wide max-w-xl mx-auto leading-relaxed">
-              En Vido -Online - Gratis - Real
+              En vivo - Online - Gratis - Real
             </p>
           </div>
 
