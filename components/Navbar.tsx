@@ -81,15 +81,6 @@ export default function Navbar() {
               HOME
             </Link>
 
-            {/* LIVE HUB */}
-            <Link
-              href="/live-hub"
-              className={`flex items-center gap-1.5 font-chakra text-xs tracking-widest transition-colors ${isActive('/live-hub') ? 'text-cyber-green' : 'text-gray-400 hover:text-white'}`}
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-cyber-green animate-live-pulse" />
-              LIVE HUB
-            </Link>
-
             {/* TOPICS dropdown */}
             <div ref={dropdownRef} className="relative">
               <button
@@ -98,7 +89,7 @@ export default function Navbar() {
                   dropdownOpen ? 'text-cyber-green' : 'text-gray-400 hover:text-white'
                 }`}
               >
-                TOPICS
+                TEMAS
                 <ChevronDown
                   className={`w-3 h-3 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`}
                 />
@@ -132,6 +123,15 @@ export default function Navbar() {
               )}
             </div>
 
+            {/* LIVE HUB */}
+            <Link
+              href="/live-hub"
+              className={`flex items-center gap-1.5 font-chakra text-xs tracking-widest transition-colors ${isActive('/live-hub') ? 'text-cyber-green' : 'text-gray-400 hover:text-white'}`}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-cyber-green animate-live-pulse" />
+              LIVE HUB
+            </Link>
+
             {/* EVENTS */}
             <Link
               href="/events"
@@ -158,7 +158,7 @@ export default function Navbar() {
         <div className="md:hidden glass border-t border-border-dark">
           <div className="px-4 pt-3 pb-4 space-y-4">
             <div>
-              <p className="section-label mb-2">TOPICS</p>
+              <p className="section-label mb-2">TEMAS</p>
               <div className="space-y-0.5">
                 {topics.map((t) => {
                   const Icon = t.icon

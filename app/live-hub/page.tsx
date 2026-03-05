@@ -1,14 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import KickPlayer from '@/components/KickPlayer'
 import CoinGeckoPriceBanner from '@/components/CoinGeckoPriceBanner'
-
-declare global {
-  interface Window {
-    twttr?: { widgets: { load: (el?: Element | null) => void } }
-  }
-}
 
 // ── SVG icons ──────────────────────────────────────────────────────────
 const YoutubeIcon = ({ className }: { className?: string }) => (
@@ -30,11 +24,18 @@ const youtubeVideos = [
   { id: 'yt-2', videoId: 'REPLACE_VIDEO_ID_2', title: 'Apalancados Spaces #2 — Prediction Markets' },
 ]
 
-// To add more posts: Tweet → ••• → Embed → copy <blockquote> → add data-theme="dark" data-width="320"
-const xPosts = [
+const xSpaces = [
   {
-    id: '2025614018572902897',
-    html: `<blockquote class="twitter-tweet" data-theme="dark" data-width="320"><p lang="es" dir="ltr">Iniciamos nuestro primer espacio online de Aplacados Spaces #1 🌌<br><br>Un espacio libre y real para hablar sobre trading, futuros, mercados de predicción, DeFi, memes, NTFs y AI.<br><br>👇🏻Agendate Miércoles, 18:00 EDT (UTC -5) <a href="https://t.co/B3fGSOnJYa">pic.twitter.com/B3fGSOnJYa</a></p>&mdash; apalancados (@ApalancadosTech) <a href="https://twitter.com/ApalancadosTech/status/2025614018572902897?ref_src=twsrc%5Etfw">February 22, 2026</a></blockquote>`,
+    id: 'space-1',
+    title: 'Apalancados X Space #1',
+    image: '/xspaces/1.png',
+    url: 'https://x.com/i/spaces/1mGPaLLzQyDJN?s=20',
+  },
+  {
+    id: 'space-2',
+    title: 'Apalancados X Space #2',
+    image: '/xspaces/2.png',
+    url: 'https://x.com/i/spaces/1kKzDMPvQDgJv?s=20',
   },
 ]
 
@@ -47,21 +48,49 @@ const TABS: { id: Tab; label: string; accent: string }[] = [
   { id: 'YOUTUBE', label: 'YOUTUBE', accent: '#ff4444' },
 ]
 
+// ── Kick channels ──────────────────────────────────────────────────────
+const KICK_CHANNELS = [
+  { id: 'apalancados', label: 'APALANCADOS', display: 'APALANCADOS' },
+  { id: 'wmb81321',    label: 'WMB81321',    display: 'WMB81321' },
+]
+
 // ── Tab content components ──────────────────────────────────────────────
 
 function KickTab() {
+  const [channel, setChannel] = useState(KICK_CHANNELS[0].id)
+  const ch = KICK_CHANNELS.find((c) => c.id === channel)!
+
   return (
     <div className="space-y-5">
-      {/* Stream header */}
-      <div className="flex items-center gap-3">
+      {/* Channel selector */}
+      <div className="flex items-center gap-2">
         <span className="w-2 h-2 rounded-full bg-cyber-green animate-live-pulse flex-shrink-0" />
+        <div className="flex items-center gap-1 p-0.5 bg-panel/60 border border-border-dark rounded-lg">
+          {KICK_CHANNELS.map((c) => {
+            const active = channel === c.id
+            return (
+              <button
+                key={c.id}
+                onClick={() => setChannel(c.id)}
+                className={`font-chakra text-[10px] tracking-widest px-4 py-1.5 rounded transition-all duration-200 ${
+                  active
+                    ? 'bg-true-black text-cyber-green shadow-md'
+                    : 'text-gray-500 hover:text-gray-300'
+                }`}
+                style={active ? { boxShadow: '0 0 14px #00ff4118' } : {}}
+              >
+                {c.label}
+              </button>
+            )
+          })}
+        </div>
+        <div className="flex-1 h-px bg-gradient-to-r from-cyber-green/20 to-transparent" />
         <span
           className="text-[10px] tracking-[0.3em] text-cyber-green uppercase"
           style={{ fontFamily: 'var(--font-dm-mono)' }}
         >
-          EN VIVO · KICK.COM/WMB81321
+          EN VIVO · KICK.COM/{ch.display}
         </span>
-        <div className="flex-1 h-px bg-gradient-to-r from-cyber-green/20 to-transparent" />
       </div>
 
       {/* 70/30 stream + chat */}
@@ -71,7 +100,7 @@ function KickTab() {
           {['top-0 left-0 border-t border-l', 'top-0 right-0 border-t border-r', 'bottom-0 left-0 border-b border-l', 'bottom-0 right-0 border-b border-r'].map((cls, i) => (
             <div key={i} className={`absolute w-5 h-5 z-10 border-cyber-green/50 ${cls}`} />
           ))}
-          <KickPlayer username="wmb81321" />
+          <KickPlayer username={ch.id} />
         </div>
 
         {/* Chat */}
@@ -83,10 +112,11 @@ function KickTab() {
             </span>
           </div>
           <iframe
-            src="https://kick.com/wmb81321/chatroom"
+            key={ch.id}
+            src={`https://kick.com/${ch.id}/chatroom`}
             className="flex-1 w-full min-h-[280px]"
             style={{ border: 'none' }}
-            title="Chat de wmb81321"
+            title={`Chat de ${ch.display}`}
           />
         </div>
       </div>
@@ -94,10 +124,10 @@ function KickTab() {
       {/* Meta bar */}
       <div className="flex items-center justify-between px-0.5">
         <span className="text-[10px] tracking-widest text-gray-600" style={{ fontFamily: 'var(--font-dm-mono)' }}>
-          STREAMER: <span className="text-cyber-green">WMB81321</span>
+          STREAMER: <span className="text-cyber-green">{ch.display}</span>
         </span>
         <a
-          href="https://kick.com/wmb81321"
+          href={`https://kick.com/${ch.id}`}
           target="_blank"
           rel="noopener noreferrer"
           className="text-[10px] tracking-widest text-cyber-green/50 hover:text-cyber-green transition-colors"
@@ -168,7 +198,7 @@ function XTab() {
     <div className="space-y-5">
       <div className="flex items-center gap-3">
         <XIcon className="w-4 h-4 text-white" />
-        <h2 className="font-chakra text-sm font-semibold text-white tracking-[0.15em]">POSTS EN X</h2>
+        <h2 className="font-chakra text-sm font-semibold text-white tracking-[0.15em]">X SPACES</h2>
         <div className="flex-1 h-px bg-gradient-to-r from-white/10 to-transparent" />
         <a
           href="https://twitter.com/ApalancadosTech"
@@ -181,17 +211,40 @@ function XTab() {
         </a>
       </div>
 
-      {/*
-        Tweets render at data-width="320" — compact card size.
-        Grid adjusts: 1 col mobile → 2 col md → 3 col lg
-      */}
-      <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4">
-        {xPosts.map((post) => (
-          <div
-            key={post.id}
-            className="break-inside-avoid rounded-xl overflow-hidden bg-panel/40 neon-border p-1.5"
-            dangerouslySetInnerHTML={{ __html: post.html }}
-          />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl">
+        {xSpaces.map((space) => (
+          <a
+            key={space.id}
+            href={space.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group block rounded-xl overflow-hidden border border-border-dark neon-border bg-panel/40 hover:border-white/20 transition-all duration-200"
+          >
+            {/* Chapter image */}
+            <div className="relative w-full overflow-hidden">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={space.image}
+                alt={space.title}
+                className="w-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
+              />
+              {/* Play overlay */}
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-black/30">
+                <div className="flex items-center gap-2 bg-black/70 border border-white/20 rounded-full px-4 py-2">
+                  <XIcon className="w-3.5 h-3.5 text-white" />
+                  <span className="text-[10px] tracking-widest text-white uppercase" style={{ fontFamily: 'var(--font-dm-mono)' }}>
+                    ABRIR SPACE ↗
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-between px-4 py-2.5 border-t border-border-dark">
+              <p className="font-chakra text-xs text-gray-300 tracking-wide">{space.title}</p>
+              <XIcon className="w-3 h-3 text-gray-500 group-hover:text-white transition-colors" />
+            </div>
+          </a>
         ))}
       </div>
     </div>
@@ -202,25 +255,7 @@ function XTab() {
 export default function LiveHubPage() {
   const [activeTab, setActiveTab] = useState<Tab>('KICK')
 
-  // Load Twitter widgets once
-  useEffect(() => {
-    const SCRIPT_ID = 'twitter-widgets-js'
-    if (!document.getElementById(SCRIPT_ID)) {
-      const s = document.createElement('script')
-      s.id = SCRIPT_ID
-      s.src = 'https://platform.twitter.com/widgets.js'
-      s.async = true
-      document.body.appendChild(s)
-    }
-  }, [])
 
-  // Re-hydrate tweet embeds whenever the X tab becomes visible
-  useEffect(() => {
-    if (activeTab === 'X') {
-      const timer = setTimeout(() => window.twttr?.widgets.load(), 150)
-      return () => clearTimeout(timer)
-    }
-  }, [activeTab])
 
   return (
     <div className="min-h-screen grid-bg">

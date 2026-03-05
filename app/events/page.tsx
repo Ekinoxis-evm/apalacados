@@ -1,4 +1,5 @@
 import { Calendar } from 'lucide-react'
+import Script from 'next/script'
 
 /*
   ── Events configuration ────────────────────────────────────────────────────
@@ -12,6 +13,11 @@ import { Calendar } from 'lucide-react'
   ────────────────────────────────────────────────────────────────────────────
 */
 const events = [
+   {
+     id: 'evt-j5eUfdolEt5vPth"',
+     embedSrc: 'https://luma.com/embed/event/evt-j5eUfdolEt5vPth/simple',
+  },
+  
   {
     id: 'evt-nQWrxvuPyqZVZVf',
     embedSrc: 'https://luma.com/embed/event/evt-nQWrxvuPyqZVZVf/simple',
@@ -23,9 +29,9 @@ const events = [
   // },
 ]
 
-function EventCard({ embedSrc }: { embedSrc: string }) {
+function EventCard({ id, embedSrc }: { id: string; embedSrc: string }) {
   return (
-    <div className="rounded-xl overflow-hidden border border-border-dark bg-panel/40 neon-border transition-all duration-300">
+    <div className="rounded-xl overflow-hidden border border-border-dark bg-panel/40 neon-border transition-all duration-300 flex flex-col">
       {/* Top accent line */}
       <div className="h-px bg-gradient-to-r from-transparent via-cyber-green/30 to-transparent" />
 
@@ -41,6 +47,18 @@ function EventCard({ embedSrc }: { embedSrc: string }) {
         tabIndex={0}
         title="Evento en Luma"
       />
+
+      {/* Checkout button */}
+      <div className="flex items-center justify-center px-5 py-4 border-t border-border-dark bg-panel/60">
+        <a
+          href={`https://luma.com/event/${id}`}
+          className="luma-checkout--button font-chakra text-xs tracking-[0.15em] text-true-black bg-cyber-green hover:brightness-110 active:scale-95 transition-all duration-150 rounded-lg px-6 py-2.5 font-semibold shadow-[0_0_18px_#00ff4133]"
+          data-luma-action="checkout"
+          data-luma-event-id={id}
+        >
+          Inscribirse al evento
+        </a>
+      </div>
     </div>
   )
 }
@@ -78,7 +96,7 @@ export default function EventsPage() {
         {events.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
             {events.map((event) => (
-              <EventCard key={event.id} embedSrc={event.embedSrc} />
+              <EventCard key={event.id} id={event.id} embedSrc={event.embedSrc} />
             ))}
           </div>
         ) : (
@@ -96,6 +114,7 @@ export default function EventsPage() {
           </div>
         )}
       </div>
+      <Script id="luma-checkout" src="https://embed.lu.ma/checkout-button.js" strategy="afterInteractive" />
     </div>
   )
 }
