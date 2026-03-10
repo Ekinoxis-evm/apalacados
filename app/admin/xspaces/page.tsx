@@ -21,7 +21,12 @@ export default function XSpacesPage() {
   const [editingSpace, setEditingSpace] = useState<XSpace | null>(null)
   const [uploading, setUploading] = useState(false)
   
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    title: string
+    image_url: string
+    space_url: string
+    created_at?: string
+  }>({
     title: '',
     image_url: '',
     space_url: '',

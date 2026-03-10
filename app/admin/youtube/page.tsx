@@ -18,7 +18,11 @@ export default function YouTubePage() {
   const [showModal, setShowModal] = useState(false)
   const [editingVideo, setEditingVideo] = useState<Video | null>(null)
   
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    video_id: string
+    title: string
+    created_at?: string
+  }>({
     video_id: '',
     title: '',
     created_at: '',

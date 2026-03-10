@@ -151,6 +151,14 @@ export default function Navbar() {
               EVENTS
             </Link>
 
+            {/* ALPHA */}
+            <Link
+              href="/alpha"
+              className={`font-chakra text-xs tracking-widest transition-colors ${isActive('/alpha') ? 'text-cyber-green' : 'text-gray-400 hover:text-white'}`}
+            >
+              ALPHA
+            </Link>
+
           </div>
 
           {/* ── Mobile Toggle ── */}
@@ -200,6 +208,9 @@ export default function Navbar() {
               </div>
               <Link href="/events" className={`block py-1.5 font-chakra text-xs tracking-widest transition-colors ${isActive('/events') ? 'text-cyber-green' : 'text-gray-400 hover:text-cyber-green'}`}>
                 EVENTS
+              </Link>
+              <Link href="/alpha" className={`block py-1.5 font-chakra text-xs tracking-widest transition-colors ${isActive('/alpha') ? 'text-cyber-green' : 'text-gray-400 hover:text-cyber-green'}`}>
+                ALPHA
               </Link>
             </div>
           </div>
