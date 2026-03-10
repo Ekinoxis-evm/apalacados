@@ -1,18 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import AlphaCard from './AlphaCard'
-
-type AlphaAsset = {
-  id: string
-  name: string
-  ticker: string
-  type: string
-  industry: string | null
-  category: string | null
-  website: string | null
-  x_url: string | null
-  contract_address: string | null
-  chain_id: string | null
-}
+import AlphaCard, { type AlphaAsset } from './AlphaCard'
 
 const TYPE_FILTERS = [
   { value: 'all', label: 'Todos' },

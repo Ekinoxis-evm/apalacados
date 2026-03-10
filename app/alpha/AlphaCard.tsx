@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { ExternalLink } from 'lucide-react'
 
-type AlphaAsset = {
+export type AlphaAsset = {
   id: string
   name: string
   ticker: string
@@ -14,6 +14,15 @@ type AlphaAsset = {
   x_url: string | null
   contract_address: string | null
   chain_id: string | null
+  // static fields from DexScreener (saved to DB)
+  image_url: string | null
+  dex_website: string | null
+  x_handle: string | null
+  dex_url: string | null
+  pair_created_at: number | null
+  base_token_address: string | null
+  base_token_name: string | null
+  base_token_symbol: string | null
 }
 
 type LiveData = {
@@ -23,11 +32,6 @@ type LiveData = {
   liquidity: number | null
   fdv: number | null
   marketCap: number | null
-  dexUrl: string | null
-  pairCreatedAt: number | null
-  imageUrl: string | null
-  website: string | null
-  xHandle: string | null
 } | null
 
 const TYPE_COLORS: Record<string, string> = {
@@ -64,7 +68,6 @@ function formatPrice(priceUsd: string | null): string {
   if (!priceUsd) return '—'
   const n = Number(priceUsd)
   if (n >= 1) return `$${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-  // show up to 6 significant decimals for small prices
   return `$${n.toPrecision(4)}`
 }
 
@@ -87,24 +90,22 @@ export default function AlphaCard({ asset }: { asset: AlphaAsset }) {
   const change = live?.priceChange24h
   const changePositive = change !== null && change !== undefined && change >= 0
 
-  // For crypto: use API data. For others: use manual fields.
-  const websiteUrl = hasDex ? live?.website : asset.website
+  // Static from DB, fallback to manual fields for non-crypto
+  const imageUrl = asset.image_url
+  const websiteUrl = hasDex ? asset.dex_website : asset.website
   const xUrl = hasDex
-    ? live?.xHandle ? `https://x.com/${live.xHandle}` : null
+    ? asset.x_handle ? `https://x.com/${asset.x_handle}` : null
     : asset.x_url
-  const imageUrl = hasDex ? live?.imageUrl : null
 
   return (
     <div
       className="group relative rounded-xl border border-border-dark bg-panel/40 flex flex-col hover:border-opacity-60 transition-all duration-200 overflow-hidden"
       style={{ borderColor: `${color}25` }}
     >
-      {/* Token image (crypto only, from API) */}
+      {/* Token image (crypto only) */}
       {hasDex && (
         <div className="w-full h-24 bg-true-black/60 flex items-center justify-center border-b border-border-dark">
-          {loadingLive ? (
-            <div className="w-10 h-10 rounded-full bg-panel/60 animate-pulse" />
-          ) : imageUrl ? (
+          {imageUrl ? (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img src={imageUrl} alt={asset.name} className="w-12 h-12 rounded-full object-cover" />
           ) : (
@@ -123,7 +124,9 @@ export default function AlphaCard({ asset }: { asset: AlphaAsset }) {
         <div className="flex items-start justify-between gap-2">
           <div>
             <h3 className="font-chakra text-sm font-bold text-white tracking-wide">{asset.name}</h3>
-            <span className="font-mono text-[10px] text-gray-500">{asset.ticker}</span>
+            <span className="font-mono text-[10px] text-gray-500">
+              {asset.base_token_symbol ?? asset.ticker}
+            </span>
           </div>
           <span
             className="px-2 py-0.5 rounded-full text-[10px] font-chakra tracking-wide border flex-shrink-0"
@@ -132,6 +135,11 @@ export default function AlphaCard({ asset }: { asset: AlphaAsset }) {
             {asset.type.toUpperCase()}
           </span>
         </div>
+
+        {/* Base token info (crypto) */}
+        {asset.base_token_name && asset.base_token_name !== asset.name && (
+          <span className="text-[10px] text-gray-600 font-mono">{asset.base_token_name}</span>
+        )}
 
         {/* Industry / Category (stocks/etf) */}
         {(asset.industry || asset.category) && (
@@ -158,10 +166,7 @@ export default function AlphaCard({ asset }: { asset: AlphaAsset }) {
               <>
                 <span className="font-mono text-sm text-white">{formatPrice(live.priceUsd)}</span>
                 {change !== null && change !== undefined && (
-                  <span
-                    className="font-mono text-xs font-semibold"
-                    style={{ color: changePositive ? '#00ff41' : '#ff4444' }}
-                  >
+                  <span className="font-mono text-xs font-semibold" style={{ color: changePositive ? '#00ff41' : '#ff4444' }}>
                     {changePositive ? '+' : ''}{change.toFixed(2)}%
                   </span>
                 )}
@@ -172,7 +177,7 @@ export default function AlphaCard({ asset }: { asset: AlphaAsset }) {
           </div>
         )}
 
-        {/* Stats row: MCap, FDV, Liquidity */}
+        {/* Stats: MCap, Liquidity, Volume */}
         {hasDex && live && (
           <div className="grid grid-cols-3 gap-1 text-[10px] font-mono">
             <div className="bg-true-black/30 rounded px-2 py-1.5 flex flex-col gap-0.5">
@@ -184,50 +189,43 @@ export default function AlphaCard({ asset }: { asset: AlphaAsset }) {
               <span className="text-gray-300">{formatUsd(live.liquidity)}</span>
             </div>
             <div className="bg-true-black/30 rounded px-2 py-1.5 flex flex-col gap-0.5">
-              <span className="text-gray-600 tracking-widest">EDAD</span>
-              <span className="text-gray-300">{formatAge(live.pairCreatedAt)}</span>
+              <span className="text-gray-600 tracking-widest">VOL 24H</span>
+              <span className="text-gray-300">{formatUsd(live.volume24h)}</span>
             </div>
           </div>
         )}
 
-        {/* Chain badge */}
-        {asset.chain_id && (
-          <span className="text-[10px] text-gray-600 font-mono uppercase tracking-widest">
-            {asset.chain_id}
-          </span>
-        )}
+        {/* Chain + pair age */}
+        <div className="flex items-center justify-between">
+          {asset.chain_id && (
+            <span className="text-[10px] text-gray-600 font-mono uppercase tracking-widest">
+              {asset.chain_id}
+            </span>
+          )}
+          {asset.pair_created_at && (
+            <span className="text-[10px] text-gray-600 font-mono">
+              par: {formatAge(asset.pair_created_at)}
+            </span>
+          )}
+        </div>
 
         {/* Links */}
         <div className="flex items-center gap-2 mt-auto pt-1">
           {websiteUrl && (
-            <a
-              href={websiteUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-1.5 rounded-lg bg-panel/60 border border-border-dark hover:border-cyber-green/40 transition-colors"
-              title="Website"
-            >
+            <a href={websiteUrl} target="_blank" rel="noopener noreferrer"
+              className="p-1.5 rounded-lg bg-panel/60 border border-border-dark hover:border-cyber-green/40 transition-colors" title="Website">
               <ExternalLink className="w-3.5 h-3.5 text-gray-500 hover:text-cyber-green transition-colors" />
             </a>
           )}
           {xUrl && (
-            <a
-              href={xUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-1.5 rounded-lg bg-panel/60 border border-border-dark hover:border-cyber-green/40 transition-colors"
-              title="X / Twitter"
-            >
+            <a href={xUrl} target="_blank" rel="noopener noreferrer"
+              className="p-1.5 rounded-lg bg-panel/60 border border-border-dark hover:border-cyber-green/40 transition-colors" title="X / Twitter">
               <XIcon className="w-3.5 h-3.5 text-gray-500 hover:text-cyber-green transition-colors" />
             </a>
           )}
-          {hasDex && live?.dexUrl && (
-            <a
-              href={live.dexUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="ml-auto text-[10px] font-mono tracking-widest text-gray-600 hover:text-cyber-green transition-colors"
-            >
+          {asset.dex_url && (
+            <a href={asset.dex_url} target="_blank" rel="noopener noreferrer"
+              className="ml-auto text-[10px] font-mono tracking-widest text-gray-600 hover:text-cyber-green transition-colors">
               DEXSCREENER ↗
             </a>
           )}

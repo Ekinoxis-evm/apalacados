@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/client'
 import { useEffect, useState } from 'react'
-import { Plus, Edit2, Trash2, X as XIcon } from 'lucide-react'
+import { Plus, Edit2, Trash2, X as XIcon, RefreshCw } from 'lucide-react'
 
 type AlphaAsset = {
   id: string
@@ -16,6 +16,26 @@ type AlphaAsset = {
   contract_address: string | null
   chain_id: string | null
   display_order: number
+  image_url: string | null
+  dex_website: string | null
+  x_handle: string | null
+  dex_url: string | null
+  pair_created_at: number | null
+  base_token_address: string | null
+  base_token_name: string | null
+  base_token_symbol: string | null
+}
+
+type DexPreview = {
+  priceUsd: string | null
+  imageUrl: string | null
+  dexWebsite: string | null
+  xHandle: string | null
+  dexUrl: string | null
+  pairCreatedAt: number | null
+  baseTokenAddress: string | null
+  baseTokenName: string | null
+  baseTokenSymbol: string | null
 }
 
 type FormData = {
@@ -66,6 +86,9 @@ export default function AdminAlphaPage() {
   const [editing, setEditing] = useState<AlphaAsset | null>(null)
   const [form, setForm] = useState<FormData>(EMPTY_FORM)
   const [filterType, setFilterType] = useState('all')
+  const [dexPreview, setDexPreview] = useState<DexPreview | null>(null)
+  const [fetchingDex, setFetchingDex] = useState(false)
+  const [dexError, setDexError] = useState('')
   const supabase = createClient()
 
   const loadAssets = async () => {
@@ -80,7 +103,29 @@ export default function AdminAlphaPage() {
 
   useEffect(() => { loadAssets() }, [])
 
+  const fetchDexData = async () => {
+    if (!form.contract_address || !form.chain_id) return
+    setFetchingDex(true)
+    setDexError('')
+    setDexPreview(null)
+    try {
+      const res = await fetch(`/api/dexscreener/${form.chain_id}/${form.contract_address}`)
+      const data = await res.json()
+      if (!data) {
+        setDexError('No se encontró el token en DexScreener.')
+      } else {
+        setDexPreview(data)
+      }
+    } catch {
+      setDexError('Error al conectar con DexScreener.')
+    } finally {
+      setFetchingDex(false)
+    }
+  }
+
   const openModal = (asset?: AlphaAsset) => {
+    setDexPreview(null)
+    setDexError('')
     if (asset) {
       setEditing(asset)
       setForm({
@@ -95,6 +140,20 @@ export default function AdminAlphaPage() {
         chain_id: asset.chain_id ?? 'ethereum',
         display_order: asset.display_order,
       })
+      // populate preview from saved DB data
+      if (asset.type === 'crypto' && asset.image_url) {
+        setDexPreview({
+          priceUsd: null,
+          imageUrl: asset.image_url,
+          dexWebsite: asset.dex_website,
+          xHandle: asset.x_handle,
+          dexUrl: asset.dex_url,
+          pairCreatedAt: asset.pair_created_at,
+          baseTokenAddress: asset.base_token_address,
+          baseTokenName: asset.base_token_name,
+          baseTokenSymbol: asset.base_token_symbol,
+        })
+      }
     } else {
       setEditing(null)
       setForm(EMPTY_FORM)
@@ -106,19 +165,37 @@ export default function AdminAlphaPage() {
     setShowModal(false)
     setEditing(null)
     setForm(EMPTY_FORM)
+    setDexPreview(null)
+    setDexError('')
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    const staticDex = form.type === 'crypto' && dexPreview ? {
+      image_url: dexPreview.imageUrl,
+      dex_website: dexPreview.dexWebsite,
+      x_handle: dexPreview.xHandle,
+      dex_url: dexPreview.dexUrl,
+      pair_created_at: dexPreview.pairCreatedAt,
+      base_token_address: dexPreview.baseTokenAddress,
+      base_token_name: dexPreview.baseTokenName,
+      base_token_symbol: dexPreview.baseTokenSymbol,
+    } : {}
+
     const payload = {
-      ...form,
+      name: form.name,
+      ticker: form.ticker,
+      type: form.type,
       industry: form.industry || null,
       category: form.category || null,
-      website: form.website || null,
-      x_url: form.x_url || null,
+      website: form.type !== 'crypto' ? (form.website || null) : null,
+      x_url: form.type !== 'crypto' ? (form.x_url || null) : null,
       contract_address: form.contract_address || null,
       chain_id: form.type === 'crypto' && form.contract_address ? form.chain_id : null,
+      display_order: form.display_order,
+      ...staticDex,
     }
+
     if (editing) {
       const { error } = await supabase.from('alpha_assets').update(payload).eq('id', editing.id)
       if (!error) { await loadAssets(); closeModal() }
@@ -144,10 +221,8 @@ export default function AdminAlphaPage() {
           <h1 className="font-chakra text-2xl font-bold text-white mb-1">Alpha Picks</h1>
           <p className="font-outfit text-sm text-gray-500">Activos curados con datos de DexScreener</p>
         </div>
-        <button
-          onClick={() => openModal()}
-          className="flex items-center gap-2 px-4 py-2 bg-cyber-green hover:bg-cyber-green/90 text-true-black font-chakra text-sm tracking-wide rounded-lg transition-colors"
-        >
+        <button onClick={() => openModal()}
+          className="flex items-center gap-2 px-4 py-2 bg-cyber-green hover:bg-cyber-green/90 text-true-black font-chakra text-sm tracking-wide rounded-lg transition-colors">
           <Plus className="w-4 h-4" />
           Nuevo Activo
         </button>
@@ -155,25 +230,18 @@ export default function AdminAlphaPage() {
 
       {/* Filter */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2">
-        <button
-          onClick={() => setFilterType('all')}
+        <button onClick={() => setFilterType('all')}
           className={`px-4 py-2 rounded-lg font-chakra text-xs tracking-wide transition-colors flex-shrink-0 border ${
-            filterType === 'all'
-              ? 'bg-cyber-green/10 text-cyber-green border-cyber-green/30'
-              : 'bg-panel/40 text-gray-400 border-border-dark hover:text-white'
-          }`}
-        >
+            filterType === 'all' ? 'bg-cyber-green/10 text-cyber-green border-cyber-green/30' : 'bg-panel/40 text-gray-400 border-border-dark hover:text-white'
+          }`}>
           Todos ({assets.length})
         </button>
         {ASSET_TYPES.map((t) => (
-          <button
-            key={t.value}
-            onClick={() => setFilterType(t.value)}
+          <button key={t.value} onClick={() => setFilterType(t.value)}
             className={`px-4 py-2 rounded-lg font-chakra text-xs tracking-wide transition-colors flex-shrink-0 border ${
               filterType === t.value ? 'border' : 'bg-panel/40 text-gray-400 border-border-dark hover:text-white'
             }`}
-            style={filterType === t.value ? { backgroundColor: `${t.color}10`, color: t.color, borderColor: `${t.color}30` } : {}}
-          >
+            style={filterType === t.value ? { backgroundColor: `${t.color}10`, color: t.color, borderColor: `${t.color}30` } : {}}>
             {t.label} ({assets.filter(a => a.type === t.value).length})
           </button>
         ))}
@@ -185,9 +253,7 @@ export default function AdminAlphaPage() {
       ) : filtered.length === 0 ? (
         <div className="text-center py-12 bg-panel/40 border border-border-dark rounded-xl">
           <p className="text-gray-500 mb-4">No hay activos</p>
-          <button onClick={() => openModal()} className="text-cyber-green hover:underline text-sm">
-            Agregar el primero
-          </button>
+          <button onClick={() => openModal()} className="text-cyber-green hover:underline text-sm">Agregar el primero</button>
         </div>
       ) : (
         <div className="overflow-x-auto">
@@ -207,32 +273,32 @@ export default function AdminAlphaPage() {
                 const typeInfo = ASSET_TYPES.find(t => t.value === asset.type)
                 return (
                   <tr key={asset.id} className="hover:bg-white/[0.02] transition-colors">
-                    <td className="py-3 px-4 font-outfit text-white">{asset.name}</td>
+                    <td className="py-3 px-4">
+                      <div className="flex items-center gap-2">
+                        {asset.image_url && (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img src={asset.image_url} alt={asset.name} className="w-6 h-6 rounded-full object-cover flex-shrink-0" />
+                        )}
+                        <span className="font-outfit text-white">{asset.name}</span>
+                      </div>
+                    </td>
                     <td className="py-3 px-4 font-mono text-gray-400 text-xs">{asset.ticker}</td>
                     <td className="py-3 px-4">
-                      <span
-                        className="px-2 py-0.5 rounded-full text-[10px] font-chakra tracking-wide border"
-                        style={{ backgroundColor: `${typeInfo?.color}10`, color: typeInfo?.color, borderColor: `${typeInfo?.color}30` }}
-                      >
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-chakra tracking-wide border"
+                        style={{ backgroundColor: `${typeInfo?.color}10`, color: typeInfo?.color, borderColor: `${typeInfo?.color}30` }}>
                         {asset.type.toUpperCase()}
                       </span>
                     </td>
                     <td className="py-3 px-4 font-mono text-gray-500 text-xs">{asset.chain_id ?? '—'}</td>
-                    <td className="py-3 px-4 font-mono text-gray-600 text-[10px] max-w-[120px] truncate">
-                      {asset.contract_address ?? '—'}
-                    </td>
+                    <td className="py-3 px-4 font-mono text-gray-600 text-[10px] max-w-[120px] truncate">{asset.contract_address ?? '—'}</td>
                     <td className="py-3 px-4">
                       <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => openModal(asset)}
-                          className="p-1.5 rounded bg-panel/60 border border-border-dark hover:border-cyber-green/40 transition-colors text-gray-400 hover:text-cyber-green"
-                        >
+                        <button onClick={() => openModal(asset)}
+                          className="p-1.5 rounded bg-panel/60 border border-border-dark hover:border-cyber-green/40 transition-colors text-gray-400 hover:text-cyber-green">
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
-                        <button
-                          onClick={() => handleDelete(asset.id)}
-                          className="p-1.5 rounded bg-panel/60 border border-border-dark hover:border-red-500/40 transition-colors text-gray-400 hover:text-red-400"
-                        >
+                        <button onClick={() => handleDelete(asset.id)}
+                          className="p-1.5 rounded bg-panel/60 border border-border-dark hover:border-red-500/40 transition-colors text-gray-400 hover:text-red-400">
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
@@ -250,15 +316,11 @@ export default function AdminAlphaPage() {
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
           <div className="bg-true-black border border-border-dark rounded-xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="font-chakra text-xl font-bold text-white">
-                {editing ? 'Editar Activo' : 'Nuevo Activo'}
-              </h2>
-              <button onClick={closeModal} className="text-gray-500 hover:text-white transition-colors">
-                <XIcon className="w-5 h-5" />
-              </button>
+              <h2 className="font-chakra text-xl font-bold text-white">{editing ? 'Editar Activo' : 'Nuevo Activo'}</h2>
+              <button onClick={closeModal} className="text-gray-500 hover:text-white transition-colors"><XIcon className="w-5 h-5" /></button>
             </div>
-            <form onSubmit={handleSubmit} className="space-y-4">
 
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block font-chakra text-xs text-gray-400 mb-2 tracking-wide">Nombre *</label>
                 <input type="text" required value={form.name}
@@ -278,53 +340,88 @@ export default function AdminAlphaPage() {
               <div>
                 <label className="block font-chakra text-xs text-gray-400 mb-2 tracking-wide">Tipo *</label>
                 <select required value={form.type}
-                  onChange={(e) => setForm({ ...form, type: e.target.value })}
+                  onChange={(e) => { setForm({ ...form, type: e.target.value }); setDexPreview(null) }}
                   className="w-full px-3 py-2 bg-panel/40 border border-border-dark rounded-lg text-white font-outfit text-sm focus:outline-none focus:border-cyber-green/30">
-                  {ASSET_TYPES.map((t) => (
-                    <option key={t.value} value={t.value}>{t.label}</option>
-                  ))}
+                  {ASSET_TYPES.map((t) => <option key={t.value} value={t.value}>{t.label}</option>)}
                 </select>
               </div>
 
               {(form.type === 'stock' || form.type === 'etf') && (
-                <div>
-                  <label className="block font-chakra text-xs text-gray-400 mb-2 tracking-wide">Industria</label>
-                  <input type="text" value={form.industry}
-                    onChange={(e) => setForm({ ...form, industry: e.target.value })}
-                    className="w-full px-3 py-2 bg-panel/40 border border-border-dark rounded-lg text-white font-outfit text-sm focus:outline-none focus:border-cyber-green/30"
-                    placeholder="Tecnología" />
-                </div>
-              )}
-
-              {(form.type === 'stock' || form.type === 'etf') && (
-                <div>
-                  <label className="block font-chakra text-xs text-gray-400 mb-2 tracking-wide">Categoría</label>
-                  <input type="text" value={form.category}
-                    onChange={(e) => setForm({ ...form, category: e.target.value })}
-                    className="w-full px-3 py-2 bg-panel/40 border border-border-dark rounded-lg text-white font-outfit text-sm focus:outline-none focus:border-cyber-green/30"
-                    placeholder="Large Cap" />
-                </div>
+                <>
+                  <div>
+                    <label className="block font-chakra text-xs text-gray-400 mb-2 tracking-wide">Industria</label>
+                    <input type="text" value={form.industry}
+                      onChange={(e) => setForm({ ...form, industry: e.target.value })}
+                      className="w-full px-3 py-2 bg-panel/40 border border-border-dark rounded-lg text-white font-outfit text-sm focus:outline-none focus:border-cyber-green/30"
+                      placeholder="Tecnología" />
+                  </div>
+                  <div>
+                    <label className="block font-chakra text-xs text-gray-400 mb-2 tracking-wide">Categoría</label>
+                    <input type="text" value={form.category}
+                      onChange={(e) => setForm({ ...form, category: e.target.value })}
+                      className="w-full px-3 py-2 bg-panel/40 border border-border-dark rounded-lg text-white font-outfit text-sm focus:outline-none focus:border-cyber-green/30"
+                      placeholder="Large Cap" />
+                  </div>
+                </>
               )}
 
               {form.type === 'crypto' && (
                 <>
                   <div>
-                    <label className="block font-chakra text-xs text-gray-400 mb-2 tracking-wide">Contrato (opcional)</label>
+                    <label className="block font-chakra text-xs text-gray-400 mb-2 tracking-wide">Contrato</label>
                     <input type="text" value={form.contract_address}
-                      onChange={(e) => setForm({ ...form, contract_address: e.target.value })}
+                      onChange={(e) => { setForm({ ...form, contract_address: e.target.value }); setDexPreview(null) }}
                       className="w-full px-3 py-2 bg-panel/40 border border-border-dark rounded-lg text-white font-outfit text-sm focus:outline-none focus:border-cyber-green/30"
                       placeholder="0x... o dirección de Solana" />
                   </div>
                   <div>
                     <label className="block font-chakra text-xs text-gray-400 mb-2 tracking-wide">Chain</label>
                     <select value={form.chain_id}
-                      onChange={(e) => setForm({ ...form, chain_id: e.target.value })}
+                      onChange={(e) => { setForm({ ...form, chain_id: e.target.value }); setDexPreview(null) }}
                       className="w-full px-3 py-2 bg-panel/40 border border-border-dark rounded-lg text-white font-outfit text-sm focus:outline-none focus:border-cyber-green/30">
-                      {CHAIN_IDS.map((c) => (
-                        <option key={c.value} value={c.value}>{c.label}</option>
-                      ))}
+                      {CHAIN_IDS.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
                     </select>
                   </div>
+
+                  {/* Fetch button */}
+                  {form.contract_address && (
+                    <button type="button" onClick={fetchDexData} disabled={fetchingDex}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-panel/40 hover:bg-panel/60 border border-cyber-green/30 text-cyber-green font-chakra text-xs tracking-wide rounded-lg transition-colors disabled:opacity-50">
+                      <RefreshCw className={`w-3.5 h-3.5 ${fetchingDex ? 'animate-spin' : ''}`} />
+                      {fetchingDex ? 'Obteniendo...' : 'Obtener datos de DexScreener'}
+                    </button>
+                  )}
+
+                  {dexError && (
+                    <p className="text-[11px] text-red-400 font-mono">{dexError}</p>
+                  )}
+
+                  {/* Preview */}
+                  {dexPreview && (
+                    <div className="rounded-lg border border-cyber-green/20 bg-cyber-green/5 p-3 space-y-2">
+                      <p className="font-chakra text-[10px] text-cyber-green tracking-widest mb-2">PREVIEW — DATOS A GUARDAR</p>
+                      <div className="flex items-center gap-3">
+                        {dexPreview.imageUrl && (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img src={dexPreview.imageUrl} alt="token" className="w-10 h-10 rounded-full object-cover border border-border-dark" />
+                        )}
+                        <div>
+                          <p className="font-mono text-xs text-white">{dexPreview.baseTokenName} <span className="text-gray-500">({dexPreview.baseTokenSymbol})</span></p>
+                          {dexPreview.priceUsd && <p className="font-mono text-xs text-cyber-green">${Number(dexPreview.priceUsd).toPrecision(4)}</p>}
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 gap-1 text-[10px] font-mono text-gray-400">
+                        {dexPreview.dexWebsite && <p>🌐 {dexPreview.dexWebsite}</p>}
+                        {dexPreview.xHandle && <p>𝕏 @{dexPreview.xHandle}</p>}
+                        {dexPreview.pairCreatedAt && (
+                          <p>📅 Par creado: {new Date(dexPreview.pairCreatedAt).toLocaleDateString('es-ES')}</p>
+                        )}
+                        {dexPreview.baseTokenAddress && (
+                          <p className="truncate">📋 {dexPreview.baseTokenAddress}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </>
               )}
 
@@ -345,11 +442,6 @@ export default function AdminAlphaPage() {
                       placeholder="https://twitter.com/..." />
                   </div>
                 </>
-              )}
-              {form.type === 'crypto' && (
-                <p className="text-[10px] text-gray-600 font-mono">
-                  Website y X se obtienen automáticamente de DexScreener.
-                </p>
               )}
 
               <div>
