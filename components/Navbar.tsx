@@ -123,14 +123,23 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* LIVE HUB */}
-            <Link
-              href="/live-hub"
-              className={`flex items-center gap-1.5 font-chakra text-xs tracking-widest transition-colors ${isActive('/live-hub') ? 'text-cyber-green' : 'text-gray-400 hover:text-white'}`}
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-cyber-green animate-live-pulse" />
-              LIVE HUB
-            </Link>
+            {/* LIVE HUB Dropdown */}
+            <div className="relative group">
+              <Link
+                href="/live-hub"
+                className={`flex items-center gap-1.5 font-chakra text-xs tracking-widest transition-colors ${pathname.startsWith('/live-hub') ? 'text-cyber-green' : 'text-gray-400 hover:text-white'}`}
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-cyber-green animate-live-pulse" />
+                LIVE HUB
+              </Link>
+              <div className="absolute left-0 top-full mt-2 w-44 glass border border-border-dark rounded-lg shadow-2xl shadow-black/70 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto transition-opacity z-40">
+                <div className="flex flex-col divide-y divide-border-dark">
+                  <Link href="/live-hub/kick" className="px-4 py-2 hover:bg-white/5 font-chakra text-xs tracking-widest text-gray-400 hover:text-cyber-green transition-colors">KICK</Link>
+                  <Link href="/live-hub/x" className="px-4 py-2 hover:bg-white/5 font-chakra text-xs tracking-widest text-gray-400 hover:text-cyber-green transition-colors">X SPACES</Link>
+                  <Link href="/live-hub/youtube" className="px-4 py-2 hover:bg-white/5 font-chakra text-xs tracking-widest text-gray-400 hover:text-cyber-green transition-colors">YOUTUBE</Link>
+                </div>
+              </div>
+            </div>
 
             {/* EVENTS */}
             <Link
@@ -179,10 +188,14 @@ export default function Navbar() {
               <Link href="/" className={`block py-1.5 font-chakra text-xs tracking-widest transition-colors ${isActive('/') ? 'text-cyber-green' : 'text-gray-400 hover:text-cyber-green'}`}>
                 HOME
               </Link>
-              <Link href="/live-hub" className={`flex items-center gap-2 py-1.5 font-chakra text-xs tracking-widest transition-colors ${isActive('/live-hub') ? 'text-cyber-green' : 'text-gray-400 hover:text-cyber-green'}`}>
-                <span className="w-1.5 h-1.5 rounded-full bg-cyber-green animate-live-pulse" />
-                LIVE HUB
-              </Link>
+              <div>
+                <p className="section-label mb-2">LIVE HUB</p>
+                <div className="space-y-0.5">
+                  <Link href="/live-hub/kick" className="block py-2 text-gray-500 hover:text-cyber-green font-chakra text-xs tracking-widest transition-colors">KICK</Link>
+                  <Link href="/live-hub/x" className="block py-2 text-gray-500 hover:text-cyber-green font-chakra text-xs tracking-widest transition-colors">X SPACES</Link>
+                  <Link href="/live-hub/youtube" className="block py-2 text-gray-500 hover:text-cyber-green font-chakra text-xs tracking-widest transition-colors">YOUTUBE</Link>
+                </div>
+              </div>
               <Link href="/events" className={`block py-1.5 font-chakra text-xs tracking-widest transition-colors ${isActive('/events') ? 'text-cyber-green' : 'text-gray-400 hover:text-cyber-green'}`}>
                 EVENTS
               </Link>
