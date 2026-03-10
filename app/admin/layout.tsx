@@ -3,13 +3,14 @@
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { 
-  LayoutDashboard, 
-  Wrench, 
-  PlayCircle, 
-  Youtube, 
+import {
+  LayoutDashboard,
+  Wrench,
+  PlayCircle,
+  Youtube,
   Calendar,
-  LogOut 
+  TrendingUp,
+  LogOut
 } from 'lucide-react'
 
 const navItems = [
@@ -18,6 +19,7 @@ const navItems = [
   { href: '/admin/xspaces', icon: PlayCircle, label: 'X Spaces' },
   { href: '/admin/youtube', icon: Youtube, label: 'YouTube' },
   { href: '/admin/events', icon: Calendar, label: 'Eventos' },
+  { href: '/admin/alpha', icon: TrendingUp, label: 'Alpha Picks' },
 ]
 
 export default function AdminLayout({

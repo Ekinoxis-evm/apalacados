@@ -98,3 +98,33 @@ CREATE TRIGGER update_youtube_videos_updated_at BEFORE UPDATE ON youtube_videos
 
 CREATE TRIGGER update_luma_events_updated_at BEFORE UPDATE ON luma_events
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Create alpha_assets table
+CREATE TABLE IF NOT EXISTS alpha_assets (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name TEXT NOT NULL,
+  ticker TEXT NOT NULL,
+  type TEXT NOT NULL CHECK (type IN ('crypto', 'stock', 'etf', 'rwa')),
+  industry TEXT,
+  category TEXT,
+  website TEXT,
+  x_url TEXT,
+  contract_address TEXT,
+  chain_id TEXT CHECK (chain_id IN ('ethereum', 'base', 'solana', 'xrpl', 'bitcoin')),
+  display_order INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- RLS
+ALTER TABLE alpha_assets ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Enable all for authenticated users" ON alpha_assets
+  FOR ALL USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Enable read for all users" ON alpha_assets
+  FOR SELECT USING (true);
+
+-- updated_at trigger
+CREATE TRIGGER update_alpha_assets_updated_at BEFORE UPDATE ON alpha_assets
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
