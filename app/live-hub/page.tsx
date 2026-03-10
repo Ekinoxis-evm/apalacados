@@ -18,26 +18,64 @@ const XIcon = ({ className }: { className?: string }) => (
 
 // ── Data ────────────────────────────────────────────────────────────────
 
-// Replace videoId values with your real YouTube video IDs
-const youtubeVideos = [
-  { id: 'yt-1', videoId: 'REPLACE_VIDEO_ID_1', title: 'Apalancados Spaces #1 — Trading & DeFi' },
-  { id: 'yt-2', videoId: 'REPLACE_VIDEO_ID_2', title: 'Apalancados Spaces #2 — Prediction Markets' },
-]
+import { useEffect } from 'react'
+import { createClient } from '@/lib/supabase/client'
 
-const xSpaces = [
-  {
-    id: 'space-1',
-    title: 'Apalancados X Space #1',
-    image: '/xspaces/1.png',
-    url: 'https://x.com/i/spaces/1mGPaLLzQyDJN?s=20',
-  },
-  {
-    id: 'space-2',
-    title: 'Apalancados X Space #2',
-    image: '/xspaces/2.png',
-    url: 'https://x.com/i/spaces/1kKzDMPvQDgJv?s=20',
-  },
-]
+type YouTubeVideo = {
+  id: string
+  video_id: string
+  title: string
+  display_order: number
+  created_at?: string
+}
+
+function useYouTubeVideos() {
+  const [youtubeVideos, setYouTubeVideos] = useState<YouTubeVideo[]>([])
+  const [loading, setLoading] = useState(true)
+  useEffect(() => {
+    const supabase = createClient()
+    const fetchVideos = async () => {
+      setLoading(true)
+      const { data, error } = await supabase
+        .from('youtube_videos')
+        .select('*')
+        .order('created_at', { ascending: false })
+      if (!error && data) setYouTubeVideos(data)
+      setLoading(false)
+    }
+    fetchVideos()
+  }, [])
+  return { youtubeVideos, loading }
+}
+
+
+type XSpace = {
+  id: string
+  title: string
+  image_url: string
+  space_url: string
+  display_order: number
+  created_at?: string
+}
+
+function useXSpaces() {
+  const [xSpaces, setXSpaces] = useState<XSpace[]>([])
+  const [loading, setLoading] = useState(true)
+  useEffect(() => {
+    const supabase = createClient()
+    const fetchSpaces = async () => {
+      setLoading(true)
+      const { data, error } = await supabase
+        .from('x_spaces')
+        .select('*')
+        .order('created_at', { ascending: false })
+      if (!error && data) setXSpaces(data)
+      setLoading(false)
+    }
+    fetchSpaces()
+  }, [])
+  return { xSpaces, loading }
+}
 
 // ── Tab types ───────────────────────────────────────────────────────────
 type Tab = 'KICK' | 'YOUTUBE' | 'X'
@@ -146,54 +184,49 @@ function KickTab() {
 }
 
 function YouTubeTab() {
+  const { youtubeVideos, loading } = useYouTubeVideos()
   return (
     <div className="space-y-5">
       <div className="flex items-center gap-3">
         <YoutubeIcon className="w-4 h-4 text-[#ff4444]" />
         <h2 className="font-chakra text-sm font-semibold text-white tracking-[0.15em]">GRABACIONES</h2>
         <div className="flex-1 h-px bg-gradient-to-r from-[#ff4444]/20 to-transparent" />
-        <span className="section-label" style={{ color: '#ff4444' }}>{youtubeVideos.filter(v => !v.videoId.startsWith('REPLACE')).length}/{youtubeVideos.length} VIDEOS</span>
+        <span className="section-label" style={{ color: '#ff4444' }}>{youtubeVideos.length} VIDEOS</span>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {youtubeVideos.map((v) => {
-          const isPlaceholder = v.videoId.startsWith('REPLACE')
-          return (
+      {loading ? (
+        <div className="text-center text-gray-500 py-8">Cargando videos...</div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {youtubeVideos.map((v) => (
             <div key={v.id} className="neon-border rounded-xl overflow-hidden bg-panel/40">
-              {isPlaceholder ? (
-                <div className="flex flex-col items-center justify-center gap-2.5 py-12 px-6 text-center">
-                  <YoutubeIcon className="w-7 h-7 text-[#ff4444]/20" />
-                  <p className="text-[10px] tracking-widest text-gray-600 uppercase" style={{ fontFamily: 'var(--font-dm-mono)' }}>
-                    AGREGA TU VIDEO ID
-                  </p>
-                  <code className="text-[10px] text-gray-700 bg-black/40 px-2.5 py-1 rounded" style={{ fontFamily: 'var(--font-dm-mono)' }}>
-                    youtubeVideos[{youtubeVideos.indexOf(v)}].videoId
-                  </code>
-                </div>
-              ) : (
-                <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
-                  <iframe
-                    src={`https://www.youtube.com/embed/${v.videoId}`}
-                    className="absolute inset-0 w-full h-full"
-                    style={{ border: 'none' }}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    title={v.title}
-                  />
-                </div>
-              )}
-              <div className="px-4 py-2.5 border-t border-border-dark">
+              <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                <iframe
+                  src={`https://www.youtube.com/embed/${v.video_id}`}
+                  className="absolute inset-0 w-full h-full"
+                  style={{ border: 'none' }}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  title={v.title}
+                />
+              </div>
+              <div className="px-4 py-2.5 border-t border-border-dark flex flex-col gap-1">
                 <p className="font-chakra text-xs text-gray-400">{v.title}</p>
+                {v.created_at && (
+                  <span className="text-[10px] text-gray-500 font-mono">
+                    {new Date(v.created_at).toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' })}
+                  </span>
+                )}
               </div>
             </div>
-          )
-        })}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
 
 function XTab() {
+  const { xSpaces, loading } = useXSpaces()
   return (
     <div className="space-y-5">
       <div className="flex items-center gap-3">
@@ -210,43 +243,52 @@ function XTab() {
           @APALANCADOSTECH ↗
         </a>
       </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl">
-        {xSpaces.map((space) => (
-          <a
-            key={space.id}
-            href={space.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group block rounded-xl overflow-hidden border border-border-dark neon-border bg-panel/40 hover:border-white/20 transition-all duration-200"
-          >
-            {/* Chapter image */}
-            <div className="relative w-full overflow-hidden">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={space.image}
-                alt={space.title}
-                className="w-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
-              />
-              {/* Play overlay */}
-              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-black/30">
-                <div className="flex items-center gap-2 bg-black/70 border border-white/20 rounded-full px-4 py-2">
-                  <XIcon className="w-3.5 h-3.5 text-white" />
-                  <span className="text-[10px] tracking-widest text-white uppercase" style={{ fontFamily: 'var(--font-dm-mono)' }}>
-                    ABRIR SPACE ↗
-                  </span>
+      {loading ? (
+        <div className="text-center text-gray-500 py-8">Cargando X Spaces...</div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl">
+          {xSpaces.map((space) => (
+            <a
+              key={space.id}
+              href={space.space_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group block rounded-xl overflow-hidden border border-border-dark neon-border bg-panel/40 hover:border-white/20 transition-all duration-200"
+            >
+              {/* Chapter image */}
+              <div className="relative w-full overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={space.image_url}
+                  alt={space.title}
+                  className="w-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
+                />
+                {/* Play overlay */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-black/30">
+                  <div className="flex items-center gap-2 bg-black/70 border border-white/20 rounded-full px-4 py-2">
+                    <XIcon className="w-3.5 h-3.5 text-white" />
+                    <span className="text-[10px] tracking-widest text-white uppercase" style={{ fontFamily: 'var(--font-dm-mono)' }}>
+                      ABRIR SPACE ↗
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-
-            {/* Footer */}
-            <div className="flex items-center justify-between px-4 py-2.5 border-t border-border-dark">
-              <p className="font-chakra text-xs text-gray-300 tracking-wide">{space.title}</p>
-              <XIcon className="w-3 h-3 text-gray-500 group-hover:text-white transition-colors" />
-            </div>
-          </a>
-        ))}
-      </div>
+              {/* Footer */}
+              <div className="flex flex-col gap-1 px-4 py-2.5 border-t border-border-dark">
+                <div className="flex items-center justify-between">
+                  <p className="font-chakra text-xs text-gray-300 tracking-wide">{space.title}</p>
+                  <XIcon className="w-3 h-3 text-gray-500 group-hover:text-white transition-colors" />
+                </div>
+                {space.created_at && (
+                  <span className="text-[10px] text-gray-500 font-mono">
+                    {new Date(space.created_at).toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' })}
+                  </span>
+                )}
+              </div>
+            </a>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

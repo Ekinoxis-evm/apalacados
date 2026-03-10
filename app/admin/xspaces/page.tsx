@@ -11,6 +11,7 @@ type XSpace = {
   image_url: string
   space_url: string
   display_order: number
+  created_at?: string
 }
 
 export default function XSpacesPage() {
@@ -24,6 +25,7 @@ export default function XSpacesPage() {
     title: '',
     image_url: '',
     space_url: '',
+    created_at: '',
   })
 
   const supabase = createClient()
@@ -72,13 +74,13 @@ export default function XSpacesPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+    const payload = { ...formData }
+    if (!payload.created_at) delete payload.created_at
     if (editingSpace) {
       const { error } = await supabase
         .from('x_spaces')
-        .update(formData)
+        .update(payload)
         .eq('id', editingSpace.id)
-      
       if (!error) {
         await loadSpaces()
         closeModal()
@@ -86,8 +88,7 @@ export default function XSpacesPage() {
     } else {
       const { error } = await supabase
         .from('x_spaces')
-        .insert([formData])
-      
+        .insert([payload])
       if (!error) {
         await loadSpaces()
         closeModal()
@@ -115,6 +116,7 @@ export default function XSpacesPage() {
         title: space.title,
         image_url: space.image_url,
         space_url: space.space_url,
+        created_at: space.created_at ? space.created_at.slice(0, 16) : '',
       })
     } else {
       setEditingSpace(null)
@@ -122,6 +124,7 @@ export default function XSpacesPage() {
         title: '',
         image_url: '',
         space_url: '',
+        created_at: '',
       })
     }
     setShowModal(true)
@@ -203,6 +206,11 @@ export default function XSpacesPage() {
                   <ExternalLink className="w-3 h-3" />
                   Ver Space
                 </a>
+                {space.created_at && (
+                  <p className="text-[11px] text-gray-400 font-mono">
+                    Fecha: {new Date(space.created_at).toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' })}
+                  </p>
+                )}
 
                 {/* Actions */}
                 <div className="flex items-center gap-2 pt-2">
@@ -316,6 +324,21 @@ export default function XSpacesPage() {
                 />
               </div>
 
+              {/* Fecha de creación */}
+              <div>
+                <label className="block font-chakra text-xs text-gray-400 mb-2 tracking-wide">
+                  Fecha de creación
+                </label>
+                <input
+                  type="datetime-local"
+                  value={formData.created_at}
+                  onChange={(e) => setFormData({ ...formData, created_at: e.target.value })}
+                  className="w-full px-3 py-2 bg-panel/40 border border-border-dark rounded-lg text-white font-outfit text-sm focus:outline-none focus:border-cyber-green/30"
+                />
+                <p className="text-[10px] text-gray-600 mt-1">
+                  Si se deja vacío, se usará la fecha actual automáticamente.
+                </p>
+              </div>
               {/* Actions */}
               <div className="flex gap-3 pt-2">
                 <button

@@ -26,7 +26,7 @@
         tools: [
       { name: 'Pump.fun', logo: 'https://pbs.twimg.com/profile_images/1748108741503803392/EmT4yP6S_400x400.jpg', website: 'https://pump.fun', x: 'https://x.com/Pumpfun' },
       { name: 'Clanker', logo: 'https://pbs.twimg.com/profile_images/1953706842032324608/Arf6RRS3_400x400.jpg', website: 'https://clanker.world', x: 'https://x.com/clanker_world' },
-      { name: 'Blur', logo: 'https://pbs.twimg.com/profile_images/1518705644450291713/X2FLVDdn_400x400.jpg', website: 'https://blur.io', x: 'https://twitter.com/blur_io' },
+      { name: 'Blur', logo: 'https://pbs.twimg.com/profile_images/1518705644450291713/X2FLVDdn_400x400.jpg', website: 'https://blur.io', x: 'https://twitter.com/blur_io' }
     ],
 
         tools: [
