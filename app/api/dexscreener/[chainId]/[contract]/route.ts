@@ -4,10 +4,16 @@ type DexPair = {
   priceUsd?: string | null
   priceChange?: { h24?: number }
   volume?: { h24?: number }
-  liquidity?: { usd?: number }
+  liquidity?: { usd?: number; base?: number; quote?: number }
   fdv?: number | null
   marketCap?: number | null
   url?: string
+  pairCreatedAt?: number | null
+  info?: {
+    imageUrl?: string | null
+    websites?: { url: string }[] | null
+    socials?: { platform: string; handle: string }[] | null
+  }
 }
 
 export async function GET(
@@ -35,6 +41,12 @@ export async function GET(
     }
 
     const pair = pairs[0]
+
+    const xSocial = pair.info?.socials?.find(
+      (s) => s.platform === 'twitter' || s.platform === 'x'
+    )
+    const website = pair.info?.websites?.[0]?.url ?? null
+
     return NextResponse.json({
       priceUsd: pair.priceUsd ?? null,
       priceChange24h: pair.priceChange?.h24 ?? null,
@@ -43,6 +55,10 @@ export async function GET(
       fdv: pair.fdv ?? null,
       marketCap: pair.marketCap ?? null,
       dexUrl: pair.url ?? null,
+      pairCreatedAt: pair.pairCreatedAt ?? null,
+      imageUrl: pair.info?.imageUrl ?? null,
+      website,
+      xHandle: xSocial?.handle ?? null,
     })
   } catch {
     return NextResponse.json(null, { status: 200 })

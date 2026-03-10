@@ -328,21 +328,29 @@ export default function AdminAlphaPage() {
                 </>
               )}
 
-              <div>
-                <label className="block font-chakra text-xs text-gray-400 mb-2 tracking-wide">Website</label>
-                <input type="url" value={form.website}
-                  onChange={(e) => setForm({ ...form, website: e.target.value })}
-                  className="w-full px-3 py-2 bg-panel/40 border border-border-dark rounded-lg text-white font-outfit text-sm focus:outline-none focus:border-cyber-green/30"
-                  placeholder="https://bitcoin.org" />
-              </div>
-
-              <div>
-                <label className="block font-chakra text-xs text-gray-400 mb-2 tracking-wide">X / Twitter</label>
-                <input type="url" value={form.x_url}
-                  onChange={(e) => setForm({ ...form, x_url: e.target.value })}
-                  className="w-full px-3 py-2 bg-panel/40 border border-border-dark rounded-lg text-white font-outfit text-sm focus:outline-none focus:border-cyber-green/30"
-                  placeholder="https://twitter.com/..." />
-              </div>
+              {form.type !== 'crypto' && (
+                <>
+                  <div>
+                    <label className="block font-chakra text-xs text-gray-400 mb-2 tracking-wide">Website</label>
+                    <input type="url" value={form.website}
+                      onChange={(e) => setForm({ ...form, website: e.target.value })}
+                      className="w-full px-3 py-2 bg-panel/40 border border-border-dark rounded-lg text-white font-outfit text-sm focus:outline-none focus:border-cyber-green/30"
+                      placeholder="https://..." />
+                  </div>
+                  <div>
+                    <label className="block font-chakra text-xs text-gray-400 mb-2 tracking-wide">X / Twitter</label>
+                    <input type="url" value={form.x_url}
+                      onChange={(e) => setForm({ ...form, x_url: e.target.value })}
+                      className="w-full px-3 py-2 bg-panel/40 border border-border-dark rounded-lg text-white font-outfit text-sm focus:outline-none focus:border-cyber-green/30"
+                      placeholder="https://twitter.com/..." />
+                  </div>
+                </>
+              )}
+              {form.type === 'crypto' && (
+                <p className="text-[10px] text-gray-600 font-mono">
+                  Website y X se obtienen automáticamente de DexScreener.
+                </p>
+              )}
 
               <div>
                 <label className="block font-chakra text-xs text-gray-400 mb-2 tracking-wide">Orden</label>
