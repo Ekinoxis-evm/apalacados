@@ -13,6 +13,7 @@ import {
   Layers,
   Smile,
   Brain,
+  Landmark,
 } from 'lucide-react'
 
 const topics = [
@@ -21,6 +22,7 @@ const topics = [
   { name: 'DeFi', href: '/topics/defi', icon: Layers, color: '#00fff0' },
   { name: 'Memes & NFTs', href: '/topics/memes', icon: Smile, color: '#bc13fe' },
   { name: 'Inteligencia Artificial', href: '/topics/ai', icon: Brain, color: '#ff006e' },
+  { name: 'Traditional Finance', href: '/topics/tradfi', icon: Landmark, color: '#f59e0b' },
 ]
 
 
@@ -164,7 +166,7 @@ export default function Navbar() {
 
       {/* ── Mobile Menu ── */}
       {mobileOpen && (
-        <div className="md:hidden glass border-t border-border-dark">
+        <div className="md:hidden glass border-t border-border-dark max-h-[80vh] overflow-y-auto">
           <div className="px-4 pt-3 pb-4 space-y-4">
             <div>
               <p className="section-label mb-2">TEMAS</p>
@@ -191,9 +193,9 @@ export default function Navbar() {
               <div>
                 <p className="section-label mb-2">LIVE HUB</p>
                 <div className="space-y-0.5">
-                  <Link href="/live-hub/kick" className="block py-2 text-gray-500 hover:text-cyber-green font-chakra text-xs tracking-widest transition-colors">KICK</Link>
-                  <Link href="/live-hub/x" className="block py-2 text-gray-500 hover:text-cyber-green font-chakra text-xs tracking-widest transition-colors">X SPACES</Link>
-                  <Link href="/live-hub/youtube" className="block py-2 text-gray-500 hover:text-cyber-green font-chakra text-xs tracking-widest transition-colors">YOUTUBE</Link>
+                  <Link href="/live-hub/kick" className="block py-2.5 text-gray-500 hover:text-cyber-green font-chakra text-xs tracking-widest transition-colors">KICK</Link>
+                  <Link href="/live-hub/x" className="block py-2.5 text-gray-500 hover:text-cyber-green font-chakra text-xs tracking-widest transition-colors">X SPACES</Link>
+                  <Link href="/live-hub/youtube" className="block py-2.5 text-gray-500 hover:text-cyber-green font-chakra text-xs tracking-widest transition-colors">YOUTUBE</Link>
                 </div>
               </div>
               <Link href="/events" className={`block py-1.5 font-chakra text-xs tracking-widest transition-colors ${isActive('/events') ? 'text-cyber-green' : 'text-gray-400 hover:text-cyber-green'}`}>

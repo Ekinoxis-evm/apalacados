@@ -41,6 +41,12 @@ const topicMeta: Record<string, { title: string; color: string; description: str
     description: 'IA aplicada a finanzas, agentes autónomos y trading algorítmico.',
     content: 'La IA está transformando los mercados. Agentes autónomos, trading algorítmico y análisis predictivo están creando nuevas oportunidades en la intersección de cripto y machine learning.',
   },
+  tradfi: {
+    title: 'Traditional Finance',
+    color: '#f59e0b',
+    description: 'Exchanges centralizados, brokers y herramientas de finanzas tradicionales.',
+    content: 'TradFi meets crypto. Exploramos exchanges centralizados, brokers regulados y plataformas que conectan las finanzas tradicionales con el ecosistema digital.',
+  },
 }
 
 function ToolCard({ tool, color }: { tool: Tool; color: string }) {
@@ -151,7 +157,7 @@ export default async function TopicPage({ params }: { params: Promise<{ slug: st
               <div className="flex-1 h-px bg-gradient-to-r from-border-dark to-transparent" />
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 min-[360px]:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
               {tools.map((tool) => (
                 <ToolCard key={tool.name} tool={tool} color={meta.color} />
               ))}

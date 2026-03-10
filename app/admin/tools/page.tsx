@@ -21,6 +21,7 @@ const topics = [
   { value: 'defi', label: 'DeFi', color: '#00fff0' },
   { value: 'memes', label: 'Memes & NFTs', color: '#bc13fe' },
   { value: 'ai', label: 'Inteligencia Artificial', color: '#ff006e' },
+  { value: 'tradfi', label: 'Traditional Finance', color: '#f59e0b' },
 ]
 
 export default function ToolsPage() {

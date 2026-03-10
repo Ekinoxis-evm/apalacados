@@ -47,13 +47,13 @@ export default function KickPage() {
         </span>
       </div>
       <div className="flex flex-col lg:flex-row gap-3">
-        <div className="relative lg:w-[70%] rounded-xl overflow-hidden border border-border-dark neon-border shadow-xl shadow-black/50">
+        <div className="relative lg:w-[70%] min-h-[220px] rounded-xl overflow-hidden border border-border-dark neon-border shadow-xl shadow-black/50">
           {['top-0 left-0 border-t border-l', 'top-0 right-0 border-t border-r', 'bottom-0 left-0 border-b border-l', 'bottom-0 right-0 border-b border-r'].map((cls, i) => (
             <div key={i} className={`absolute w-5 h-5 z-10 border-cyber-green/50 ${cls}`} />
           ))}
           <KickPlayer username={ch.id} />
         </div>
-        <div className="lg:w-[30%] min-h-[300px] rounded-xl overflow-hidden border border-border-dark bg-panel/60 flex flex-col">
+        <div className="lg:w-[30%] min-h-[200px] lg:min-h-[300px] rounded-xl overflow-hidden border border-border-dark bg-panel/60 flex flex-col">
           <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border-dark flex-shrink-0">
             <span className="w-1.5 h-1.5 rounded-full bg-cyber-green animate-live-pulse" />
             <span className="text-[10px] tracking-widest text-gray-500 uppercase" style={{ fontFamily: 'var(--font-dm-mono)' }}>
