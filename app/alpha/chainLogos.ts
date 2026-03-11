@@ -3,7 +3,7 @@
 
 export const CHAIN_LOGOS: Record<string, string> = {
   ethereum: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png',
-  base: 'https://assets.coingecko.com/coins/images/30161/large/base.png',
+  base: 'https://pbs.twimg.com/profile_images/1945608199500910592/rnk6ixxH_400x400.jpg',
   solana: 'https://assets.coingecko.com/coins/images/4128/large/solana.png',
   xrpl: 'https://assets.coingecko.com/coins/images/44/large/xrp-symbol-white-128.png',
   bitcoin: 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png',

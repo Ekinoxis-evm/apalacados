@@ -14,7 +14,6 @@ CREATE TABLE IF NOT EXISTS tools (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Create x_spaces table
 CREATE TABLE IF NOT EXISTS x_spaces (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   title TEXT NOT NULL,
@@ -31,8 +30,19 @@ CREATE TABLE IF NOT EXISTS youtube_videos (
   video_id TEXT NOT NULL UNIQUE,
   title TEXT NOT NULL,
   display_order INTEGER DEFAULT 0,
+-- Table: digital_asset_categories
+CREATE TABLE IF NOT EXISTS digital_asset_categories (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL UNIQUE
+);
+
+-- Join Table: asset_category_links
+CREATE TABLE IF NOT EXISTS asset_category_links (
+  asset_id UUID REFERENCES alpha_assets(id) ON DELETE CASCADE,
+  category_id UUID REFERENCES digital_asset_categories(id) ON DELETE CASCADE,
+  PRIMARY KEY (asset_id, category_id)
+);
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- Create luma_events table
@@ -41,7 +51,6 @@ CREATE TABLE IF NOT EXISTS luma_events (
   event_id TEXT NOT NULL UNIQUE,
   embed_src TEXT NOT NULL,
   display_order INTEGER DEFAULT 0,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 

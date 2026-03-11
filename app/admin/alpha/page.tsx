@@ -64,6 +64,8 @@ const CHAIN_IDS = [
   { value: 'solana', label: 'Solana' },
   { value: 'xrpl', label: 'XRPL' },
   { value: 'bitcoin', label: 'Bitcoin' },
+  { value: 'arbitrum', label: 'Arbitrum' },
+  { value: 'linea', label: 'Linea' },
 ]
 
 const EMPTY_FORM: FormData = {
