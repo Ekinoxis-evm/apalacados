@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { CHAIN_LOGOS } from './chainLogos'
 import { ExternalLink } from 'lucide-react'
 
 export type AlphaAsset = {
@@ -71,7 +72,10 @@ function formatPrice(priceUsd: string | null): string {
   return `$${n.toPrecision(4)}`
 }
 
-export default function AlphaCard({ asset }: { asset: AlphaAsset }) {
+
+
+
+export default function AlphaCard({ asset, sort }: { asset: AlphaAsset, sort?: string }) {
   const [live, setLive] = useState<LiveData>(undefined as unknown as LiveData)
   const [loadingLive, setLoadingLive] = useState(false)
   const color = TYPE_COLORS[asset.type] ?? '#00ff41'
@@ -198,13 +202,20 @@ export default function AlphaCard({ asset }: { asset: AlphaAsset }) {
         {/* Chain + pair age */}
         <div className="flex items-center justify-between">
           {asset.chain_id && (
-            <span className="text-[10px] text-gray-600 font-mono uppercase tracking-widest">
-              {asset.chain_id}
+            <span className="flex items-center gap-1 text-[10px] text-gray-600 font-mono uppercase tracking-widest">
+              {CHAIN_LOGOS[asset.chain_id] && (
+                <img
+                  src={CHAIN_LOGOS[asset.chain_id]}
+                  alt={asset.chain_id ?? ''}
+                  className="w-5 h-5 inline-block rounded-full"
+                  onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                />
+              )}
             </span>
           )}
           {asset.pair_created_at && (
-            <span className="text-[10px] text-gray-600 font-mono">
-              par: {formatAge(asset.pair_created_at)}
+            <span className="text-[10px] text-gray-400 font-mono" title={new Date(asset.pair_created_at).toLocaleString()}>
+              Lanzado: {new Date(asset.pair_created_at).toLocaleDateString('es-ES', { year: 'numeric', month: 'short', day: 'numeric' })}
             </span>
           )}
         </div>

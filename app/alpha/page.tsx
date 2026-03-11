@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import AlphaCard, { type AlphaAsset } from './AlphaCard'
+import AlphaSortBar from './AlphaSortBar'
+import ChainFilterBar from './ChainFilterBar'
 
 const TYPE_FILTERS = [
   { value: 'all', label: 'Todos' },
@@ -12,10 +14,12 @@ const TYPE_FILTERS = [
 export default async function AlphaPage({
   searchParams,
 }: {
-  searchParams: Promise<{ type?: string }>
+  searchParams: Promise<{ type?: string; chain?: string; sort?: string }>
 }) {
-  const { type } = await searchParams
+  const { type, chain, sort } = await searchParams
   const activeType = type ?? 'all'
+  const activeChain = chain ?? 'all'
+  const activeSort = sort ?? 'default'
 
   const supabase = await createClient()
   const query = supabase
@@ -27,7 +31,11 @@ export default async function AlphaPage({
     ? await query
     : await query.eq('type', activeType)
 
-  const items = (assets ?? []) as AlphaAsset[]
+  let items = (assets ?? []) as AlphaAsset[]
+  // Filter by chain if selected
+  if (activeChain !== 'all') {
+    items = items.filter(a => a.chain_id === activeChain)
+  }
 
   return (
     <div className="min-h-screen grid-bg">
@@ -44,25 +52,12 @@ export default async function AlphaPage({
           </p>
         </div>
 
-        {/* Filter bar */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1">
-          {TYPE_FILTERS.map((f) => (
-            <a
-              key={f.value}
-              href={f.value === 'all' ? '/alpha' : `/alpha?type=${f.value}`}
-              className={`px-4 py-2 rounded-lg font-chakra text-xs tracking-wide transition-colors flex-shrink-0 border ${
-                activeType === f.value
-                  ? 'bg-cyber-green/10 text-cyber-green border-cyber-green/30'
-                  : 'bg-panel/40 text-gray-400 border-border-dark hover:text-white'
-              }`}
-            >
-              {f.label}
-            </a>
-          ))}
-          <span className="ml-auto text-[10px] text-gray-600 font-mono tracking-widest flex-shrink-0">
-            {items.length} ACTIVOS
-          </span>
-        </div>
+
+        {/* Filter & Sort bar (Client Component) */}
+        <AlphaSortBar activeType={activeType} sort={activeSort} itemsCount={items.length} />
+
+        {/* Chain filter (Client Component) */}
+        <ChainFilterBar activeType={activeType} activeChain={activeChain} activeSort={activeSort} assets={assets ?? []} />
 
         {/* Grid */}
         {items.length === 0 ? (
@@ -72,7 +67,7 @@ export default async function AlphaPage({
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {items.map((asset) => (
-              <AlphaCard key={asset.id} asset={asset} />
+              <AlphaCard key={asset.id} asset={asset} sort={sort} />
             ))}
           </div>
         )}
