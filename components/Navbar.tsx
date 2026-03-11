@@ -28,14 +28,19 @@ const topics = [
 
 export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [liveHubOpen, setLiveHubOpen] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const liveHubRef = useRef<HTMLDivElement>(null)
   const pathname = usePathname()
 
   useEffect(() => {
     function handleOutside(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setDropdownOpen(false)
+      }
+      if (liveHubRef.current && !liveHubRef.current.contains(e.target as Node)) {
+        setLiveHubOpen(false)
       }
     }
     document.addEventListener('mousedown', handleOutside)
@@ -45,6 +50,7 @@ export default function Navbar() {
   useEffect(() => {
     setMobileOpen(false)
     setDropdownOpen(false)
+    setLiveHubOpen(false)
   }, [pathname])
 
   const isActive = (href: string) => pathname === href
@@ -72,9 +78,8 @@ export default function Navbar() {
             </span>
           </Link>
 
-          {/* ── Desktop Nav — order: HOME · LIVE HUB · TOPICS · EVENTS ── */}
+          {/* ── Desktop Nav — order: HOME · ALPHA · TEMAS · LIVE HUB · EVENTS ── */}
           <div className="hidden md:flex items-center gap-6">
-
             {/* HOME */}
             <Link
               href="/"
@@ -83,20 +88,24 @@ export default function Navbar() {
               HOME
             </Link>
 
-            {/* TOPICS dropdown */}
+            {/* ALPHA */}
+            <Link
+              href="/alpha"
+              className={`font-chakra text-xs tracking-widest transition-colors ${isActive('/alpha') ? 'text-cyber-green' : 'text-gray-400 hover:text-white'}`}
+            >
+              ALPHA
+            </Link>
+
+            {/* TEMAS dropdown */}
             <div ref={dropdownRef} className="relative">
               <button
                 onClick={() => setDropdownOpen((v) => !v)}
-                className={`flex items-center gap-1 font-chakra text-xs tracking-widest transition-colors py-1 ${
+                className={`font-chakra text-xs tracking-widest transition-colors py-1 ${
                   dropdownOpen ? 'text-cyber-green' : 'text-gray-400 hover:text-white'
                 }`}
               >
                 TEMAS
-                <ChevronDown
-                  className={`w-3 h-3 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`}
-                />
               </button>
-
               {dropdownOpen && (
                 <div className="absolute top-full left-0 mt-3 w-60 glass border border-border-dark rounded-lg overflow-hidden shadow-2xl shadow-black/70">
                   <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyber-green/30 to-transparent" />
@@ -125,22 +134,24 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* LIVE HUB Dropdown */}
-            <div className="relative group">
-              <Link
-                href="/live-hub"
-                className={`flex items-center gap-1.5 font-chakra text-xs tracking-widest transition-colors ${pathname.startsWith('/live-hub') ? 'text-cyber-green' : 'text-gray-400 hover:text-white'}`}
+            {/* LIVE HUB Dropdown (click to open) */}
+            <div ref={liveHubRef} className="relative">
+              <button
+                onClick={() => setLiveHubOpen((v) => !v)}
+                className={`flex items-center gap-1.5 font-chakra text-xs tracking-widest transition-colors py-1 ${pathname.startsWith('/live-hub') ? 'text-cyber-green' : 'text-gray-400 hover:text-white'}`}
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-cyber-green animate-live-pulse" />
                 LIVE HUB
-              </Link>
-              <div className="absolute left-0 top-full mt-2 w-44 glass border border-border-dark rounded-lg shadow-2xl shadow-black/70 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 pointer-events-none group-hover:pointer-events-auto group-focus-within:pointer-events-auto transition-opacity z-40">
-                <div className="flex flex-col divide-y divide-border-dark">
-                  <Link href="/live-hub/kick" className="px-4 py-2 hover:bg-white/5 font-chakra text-xs tracking-widest text-gray-400 hover:text-cyber-green transition-colors">KICK</Link>
-                  <Link href="/live-hub/x" className="px-4 py-2 hover:bg-white/5 font-chakra text-xs tracking-widest text-gray-400 hover:text-cyber-green transition-colors">X SPACES</Link>
-                  <Link href="/live-hub/youtube" className="px-4 py-2 hover:bg-white/5 font-chakra text-xs tracking-widest text-gray-400 hover:text-cyber-green transition-colors">YOUTUBE</Link>
+              </button>
+              {liveHubOpen && (
+                <div className="absolute left-0 top-full mt-2 w-44 glass border border-border-dark rounded-lg shadow-2xl shadow-black/70 z-40">
+                  <div className="flex flex-col divide-y divide-border-dark">
+                    <Link href="/live-hub/kick" className="px-4 py-2 hover:bg-white/5 font-chakra text-xs tracking-widest text-gray-400 hover:text-cyber-green transition-colors">KICK</Link>
+                    <Link href="/live-hub/x" className="px-4 py-2 hover:bg-white/5 font-chakra text-xs tracking-widest text-gray-400 hover:text-cyber-green transition-colors">X SPACES</Link>
+                    <Link href="/live-hub/youtube" className="px-4 py-2 hover:bg-white/5 font-chakra text-xs tracking-widest text-gray-400 hover:text-cyber-green transition-colors">YOUTUBE</Link>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* EVENTS */}
@@ -150,15 +161,6 @@ export default function Navbar() {
             >
               EVENTS
             </Link>
-
-            {/* ALPHA */}
-            <Link
-              href="/alpha"
-              className={`font-chakra text-xs tracking-widest transition-colors ${isActive('/alpha') ? 'text-cyber-green' : 'text-gray-400 hover:text-white'}`}
-            >
-              ALPHA
-            </Link>
-
           </div>
 
           {/* ── Mobile Toggle ── */}
@@ -176,6 +178,12 @@ export default function Navbar() {
       {mobileOpen && (
         <div className="md:hidden glass border-t border-border-dark max-h-[80vh] overflow-y-auto">
           <div className="px-4 pt-3 pb-4 space-y-4">
+            <Link href="/" className={`block py-1.5 font-chakra text-xs tracking-widest transition-colors ${isActive('/') ? 'text-cyber-green' : 'text-gray-400 hover:text-cyber-green'}`}>
+              HOME
+            </Link>
+            <Link href="/alpha" className={`block py-1.5 font-chakra text-xs tracking-widest transition-colors ${isActive('/alpha') ? 'text-cyber-green' : 'text-gray-400 hover:text-cyber-green'}`}>
+              ALPHA
+            </Link>
             <div>
               <p className="section-label mb-2">TEMAS</p>
               <div className="space-y-0.5">
@@ -194,25 +202,17 @@ export default function Navbar() {
                 })}
               </div>
             </div>
-            <div className="border-t border-border-dark pt-3 space-y-2">
-              <Link href="/" className={`block py-1.5 font-chakra text-xs tracking-widest transition-colors ${isActive('/') ? 'text-cyber-green' : 'text-gray-400 hover:text-cyber-green'}`}>
-                HOME
-              </Link>
-              <div>
-                <p className="section-label mb-2">LIVE HUB</p>
-                <div className="space-y-0.5">
-                  <Link href="/live-hub/kick" className="block py-2.5 text-gray-500 hover:text-cyber-green font-chakra text-xs tracking-widest transition-colors">KICK</Link>
-                  <Link href="/live-hub/x" className="block py-2.5 text-gray-500 hover:text-cyber-green font-chakra text-xs tracking-widest transition-colors">X SPACES</Link>
-                  <Link href="/live-hub/youtube" className="block py-2.5 text-gray-500 hover:text-cyber-green font-chakra text-xs tracking-widest transition-colors">YOUTUBE</Link>
-                </div>
+            <div>
+              <p className="section-label mb-2">LIVE HUB</p>
+              <div className="space-y-0.5">
+                <Link href="/live-hub/kick" className="block py-2.5 text-gray-500 hover:text-cyber-green font-chakra text-xs tracking-widest transition-colors">KICK</Link>
+                <Link href="/live-hub/x" className="block py-2.5 text-gray-500 hover:text-cyber-green font-chakra text-xs tracking-widest transition-colors">X SPACES</Link>
+                <Link href="/live-hub/youtube" className="block py-2.5 text-gray-500 hover:text-cyber-green font-chakra text-xs tracking-widest transition-colors">YOUTUBE</Link>
               </div>
-              <Link href="/events" className={`block py-1.5 font-chakra text-xs tracking-widest transition-colors ${isActive('/events') ? 'text-cyber-green' : 'text-gray-400 hover:text-cyber-green'}`}>
-                EVENTS
-              </Link>
-              <Link href="/alpha" className={`block py-1.5 font-chakra text-xs tracking-widest transition-colors ${isActive('/alpha') ? 'text-cyber-green' : 'text-gray-400 hover:text-cyber-green'}`}>
-                ALPHA
-              </Link>
             </div>
+            <Link href="/events" className={`block py-1.5 font-chakra text-xs tracking-widest transition-colors ${isActive('/events') ? 'text-cyber-green' : 'text-gray-400 hover:text-cyber-green'}`}>
+              EVENTS
+            </Link>
           </div>
         </div>
       )}

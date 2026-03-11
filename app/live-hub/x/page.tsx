@@ -60,41 +60,43 @@ export default function XSpacesPage() {
       {loading ? (
         <div className="text-center text-gray-500 py-8">Cargando X Spaces...</div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 justify-center max-w-4xl mx-auto">
           {xSpaces.map((space) => (
             <a
               key={space.id}
               href={space.space_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="group block rounded-xl overflow-hidden border border-border-dark neon-border bg-panel/40 hover:border-white/20 transition-all duration-200"
+              className="group flex flex-col items-center rounded-xl overflow-hidden border border-border-dark neon-border bg-panel/40 hover:border-white/20 transition-all duration-200 p-4 w-full max-w-[220px] mx-auto"
             >
               {/* Chapter image */}
-              <div className="relative w-full overflow-hidden">
+              <div className="relative w-[150px] h-[150px] overflow-hidden rounded-lg mb-3">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={space.image_url}
                   alt={space.title}
-                  className="w-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
+                  className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
+                  width={150}
+                  height={150}
                 />
                 {/* Play overlay */}
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-black/30">
                   <div className="flex items-center gap-2 bg-black/70 border border-white/20 rounded-full px-4 py-2">
-                    <XIcon className="w-3.5 h-3.5 text-white" />
-                    <span className="text-[10px] tracking-widest text-white uppercase" style={{ fontFamily: 'var(--font-dm-mono)' }}>
+                    <XIcon className="w-4 h-4 text-white" />
+                    <span className="text-[11px] tracking-widest text-white uppercase" style={{ fontFamily: 'var(--font-dm-mono)' }}>
                       ABRIR SPACE ↗
                     </span>
                   </div>
                 </div>
               </div>
               {/* Footer */}
-              <div className="flex flex-col gap-1 px-4 py-2.5 border-t border-border-dark">
+              <div className="flex flex-col gap-1 w-full px-2 py-2 border-t border-border-dark">
                 <div className="flex items-center justify-between">
-                  <p className="font-chakra text-xs text-gray-300 tracking-wide">{space.title}</p>
-                  <XIcon className="w-3 h-3 text-gray-500 group-hover:text-white transition-colors" />
+                  <p className="font-chakra text-sm text-gray-300 tracking-wide line-clamp-2">{space.title}</p>
+                  <XIcon className="w-4 h-4 text-gray-500 group-hover:text-white transition-colors" />
                 </div>
                 {space.created_at && (
-                  <span className="text-[10px] text-gray-500 font-mono">
+                  <span className="text-[11px] text-gray-500 font-mono">
                     {new Date(space.created_at).toLocaleString('es-ES', { dateStyle: 'medium', timeStyle: 'short' })}
                   </span>
                 )}

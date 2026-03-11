@@ -1,12 +1,11 @@
 import Link from 'next/link'
-import { TrendingUp, Target, Layers, Smile, Brain, ArrowRight } from 'lucide-react'
+import { TrendingUp, Target, Layers, Smile, Brain, Landmark, ArrowRight } from 'lucide-react'
 
 const pillars = [
   {
     id: 'trading',
     title: 'Trading & Perps',
-    description:
-      'Futuros perpetuos, estrategias de trading activo y análisis técnico en tiempo real.',
+    description: 'Futuros perpetuos, estrategias de trading activo y análisis técnico en tiempo real.',
     icon: TrendingUp,
     href: '/topics/trading',
     color: '#00ff41',
@@ -15,8 +14,7 @@ const pillars = [
   {
     id: 'prediction',
     title: 'Prediction Markets',
-    description:
-      'Mercados de predicción descentralizados, apuestas on-chain y probabilidades de eventos.',
+    description: 'Mercados de predicción descentralizados, apuestas on-chain y probabilidades de eventos.',
     icon: Target,
     href: '/topics/prediction',
     color: '#00d4ff',
@@ -25,8 +23,7 @@ const pillars = [
   {
     id: 'defi',
     title: 'DeFi',
-    description:
-      'Protocolos DeFi, yield farming, liquidity pools y las mejores oportunidades del ecosistema.',
+    description: 'Protocolos DeFi, yield farming, liquidity pools y las mejores oportunidades del ecosistema.',
     icon: Layers,
     href: '/topics/defi',
     color: '#00fff0',
@@ -35,8 +32,7 @@ const pillars = [
   {
     id: 'memes',
     title: 'Memes & NFTs',
-    description:
-      'Cultura crypto, meme coins, NFTs y el pulso real de la comunidad Web3.',
+    description: 'Cultura crypto, meme coins, NFTs y el pulso real de la comunidad Web3.',
     icon: Smile,
     href: '/topics/memes',
     color: '#bc13fe',
@@ -45,12 +41,20 @@ const pillars = [
   {
     id: 'ai',
     title: 'Inteligencia Artificial',
-    description:
-      'IA aplicada a finanzas, agentes autónomos y el futuro del trading algorítmico.',
+    description: 'IA aplicada a finanzas, agentes autónomos y el futuro del trading algorítmico.',
     icon: Brain,
     href: '/topics/ai',
     color: '#ff006e',
     tag: 'AI',
+  },
+  {
+    id: 'tradfi',
+    title: 'Traditional Finance',
+    description: 'Exchanges centralizados, brokers y herramientas de finanzas tradicionales. TradFi meets crypto.',
+    icon: Landmark,
+    href: '/topics/tradfi',
+    color: '#f59e0b',
+    tag: 'TRADFI',
   },
 ]
 
